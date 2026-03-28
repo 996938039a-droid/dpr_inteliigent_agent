@@ -56,7 +56,7 @@ class CostsHandler:
         profile = get_profile(store.industry_code)
 
         # Service/non-RM industries: skip raw material questions
-        if not profile.flags.rm_cogs:
+        if not profile.applicability.has_rm_cost:
             store.current_section = store.next_incomplete_section()
             from agents.handlers import FIRST_QUESTIONS
             return (f"✅ No raw material costs for **{profile.name}** businesses — skipping COGS section.\n\n"
