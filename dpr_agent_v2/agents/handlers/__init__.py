@@ -2,7 +2,6 @@
 
 from core.industry_config import get_profile
 
-# Base questions (industry-agnostic)
 FIRST_QUESTIONS = {
     "profile":  (
         "Let\'s start with your project details.\n\n"
@@ -45,16 +44,11 @@ FIRST_QUESTIONS = {
     "review": "✅ All inputs captured. Generating your review screen...",
 }
 
-
 def get_first_question(section: str, industry_code: str = "manufacturing_general") -> str:
-    """
-    Return the first question for a section, tailored to the industry.
-    """
     profile = get_profile(industry_code)
-    app     = profile.applicability
 
     if section == "costs":
-        if not app.has_rm_cost:
+        if not profile.flags.rm_cogs:
             return (
                 "Let\'s cover your direct operating costs.\n\n"
                 f"For a **{profile.name}** business, what are your main direct cost inputs? "
@@ -75,7 +69,7 @@ def get_first_question(section: str, industry_code: str = "manufacturing_general
         return FIRST_QUESTIONS["revenue"]
 
     if section == "wc":
-        if not app.has_raw_materials:
+        if not profile.flags.raw_materials:
             return (
                 "Working capital details:\n\n"
                 "Debtor days (how long customers take to pay), "
@@ -84,9 +78,9 @@ def get_first_question(section: str, industry_code: str = "manufacturing_general
                 f"FG={profile.typical_stock_fg} — confirm or change."
             )
         extra = ""
-        if app.has_wip:
+        if profile.flags.wip:
             extra += f" WIP days (default {profile.typical_wip_days})."
-        if app.has_cold_store:
+        if profile.flags.cold_store:
             extra += f" Cold store days (default {profile.typical_cold_days})."
         if extra:
             return FIRST_QUESTIONS["wc"] + extra
